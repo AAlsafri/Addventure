@@ -26,7 +26,15 @@
 
 .destinations-page {
   display: flex;
+  background-image: url(bg.webp);
   padding: 2rem; /* Adjust as needed */
+  min-height: 100vh;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-attachment: fixed;
+  padding-top: 40px;
+  overflow: hidden; /* Hide overflow to prevent scrolling issues */
 }
 
 .header-and-destinations {
@@ -102,11 +110,17 @@
 
 .destination-search {
   padding: 10px;
-  font-size: 16px;
+  background-color: transparent;
+  font-size: 20px;
   border-radius: 4px;
   border: 1px solid #ccc;
-  background-color: rgba(255, 255, 255, 0.3); /* Semi-transparent background */
-  backdrop-filter: blur(10px); /* Apply the blur effect */
+  background-color: rgba(
+    255,
+    255,
+    255,
+    0.305
+  ); /* Semi-transparent background */
+  backdrop-filter: blur(20px); /* Apply the blur effect */
 }
 
 .destinations {
@@ -148,7 +162,7 @@
   opacity: 0; /* Start hidden */
   transform: translateY(20px);
   animation: fadeInUp 0.8s forwards;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(40px);
 }
 
 .destination:nth-child(1) {

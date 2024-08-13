@@ -31,10 +31,10 @@ export const Login = () => {
   };
 
   return (
-    <main className="container-login">
+    <main className="add-destination-form">
       <section>
         <form className="form-login" onSubmit={handleLogin}>
-          <h1>trip-ify</h1>
+          <h1>Add·venturer</h1>
           <h2>Please sign in</h2>
           <fieldset>
             <div className="form-group">

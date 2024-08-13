@@ -47,8 +47,8 @@ export const Register = () => {
 
   return (
     <main style={{ textAlign: "center" }}>
-      <form className="form-login" onSubmit={handleRegister}>
-        <h1>trip-ify</h1>
+      <form className="add-destination-form" onSubmit={handleRegister}>
+        <h1>Add·venturer</h1>
         <h2>Please Register</h2>
         <fieldset>
           <div className="form-group">
