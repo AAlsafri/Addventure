@@ -1,0 +1,44 @@
+.user-profile-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.user-profile-container h2 {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.profile-stats {
+  margin-top: 20px;
+}
+
+.profile-stats p {
+  font-size: 18px;
+  margin: 10px 0;
+}
+
+.journal-entries {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.journal-entry {
+  flex: 1 1 calc(50% - 20px);
+  background-color: #fff;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.journal-entry h4 {
+  margin-bottom: 10px;
+}
+
+.journal-entry p {
+  margin: 5px 0;
+}
