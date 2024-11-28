@@ -8,12 +8,14 @@ export const AddDestinationPage = ({ currentUser, onFormSubmit }) => {
     name: "",
     country: "",
     state: "",
-    continent: "",
+    continent: "", // Default empty
     details: "",
     isLiked: false,
-    visitedDate: "", // Add the visitedDate field
-    user_id: currentUser ? currentUser.id : null, // Handle undefined case
+    visitedDate: "",
+    user_id: currentUser ? currentUser.id : null, // Handle undefined user case
   });
+  const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   const navigate = useNavigate();
 
@@ -29,75 +31,60 @@ export const AddDestinationPage = ({ currentUser, onFormSubmit }) => {
 
   const handleChange = (event) => {
     const { name, value } = event.target;
-    setNewDestination({ ...newDestination, [name]: value });
+    setNewDestination((prevDestination) => ({
+      ...prevDestination,
+      [name]: value,
+    }));
+  };
+
+  const handleCheckboxChange = () => {
+    setNewDestination((prevDestination) => ({
+      ...prevDestination,
+      isLiked: !prevDestination.isLiked,
+    }));
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (!currentUser) {
-      alert("User not logged in");
+      setError("User not logged in");
       return;
     }
-    // Ensure user_id is set correctly
-    if (!newDestination.user_id) {
-      newDestination.user_id = currentUser.id;
-    }
-    const addedDestination = await addNewDestination(newDestination);
-    setNewDestination({
-      name: "",
-      country: "",
-      state: "",
-      continent: "",
-      details: "",
-      isLiked: false,
-      visitedDate: "", // Reset the visitedDate field
-      user_id: currentUser.id,
-    });
-    await updateTravelHistory(currentUser.id, addedDestination.id); // Update travel history
 
-    onFormSubmit(); // Call the onFormSubmit prop to exit the form
-    navigate("/destinations");
-  };
+    const selectedContinent = continents.find(
+      (continent) => continent.name === newDestination.continent
+    );
 
-  const updateTravelHistory = async (userId, destinationId) => {
+    const payload = {
+      ...newDestination,
+      continent: selectedContinent ? selectedContinent.id : null,
+      location: `${newDestination.country}, ${newDestination.state}, ${newDestination.continent}`,
+    };
+
     try {
-      const travelHistoryResponse = await fetch(
-        `http://localhost:8088/travelHistory?user_id=${userId}`
-      );
-      const travelHistoryData = await travelHistoryResponse.json();
+      await addNewDestination(payload);
+      setNewDestination({
+        name: "",
+        country: "",
+        state: "",
+        continent: "",
+        details: "",
+        isLiked: false,
+        visitedDate: "",
+        user_id: currentUser.id,
+      });
 
-      if (travelHistoryData.length > 0) {
-        // User already has travel history, update it
-        const userTravelHistory = travelHistoryData[0];
-        userTravelHistory.destination_ids.push(destinationId);
+      setError(""); // Clear any existing error
+      setSuccessMessage("Destination added successfully!"); // Set success message
+      setTimeout(() => {
+        setSuccessMessage(""); // Clear success message after 3 seconds
+      }, 3000);
 
-        await fetch(
-          `http://localhost:8088/travelHistory/${userTravelHistory.id}`,
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(userTravelHistory),
-          }
-        );
-      } else {
-        // User has no travel history, create a new entry
-        const newTravelHistory = {
-          user_id: userId,
-          destination_ids: [destinationId],
-        };
-
-        await fetch("http://localhost:8088/travelHistory", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(newTravelHistory),
-        });
-      }
-    } catch (error) {
-      console.error("Error updating travel history:", error);
+      if (onFormSubmit) onFormSubmit(); // Notify parent component
+      navigate("/destinations");
+    } catch (err) {
+      console.error("Error adding destination:", err.response?.data || err);
+      setError("Failed to add destination. Please check your form.");
     }
   };
 
@@ -119,6 +106,8 @@ export const AddDestinationPage = ({ currentUser, onFormSubmit }) => {
         </svg>
       </button>
       <h2>Add New Destination</h2>
+      {successMessage && <p className="success-message">{successMessage}</p>}
+      {error && <p className="error-message">{error}</p>}
       <form onSubmit={handleSubmit}>
         <div>
           <label htmlFor="name">Name:</label>
@@ -128,6 +117,7 @@ export const AddDestinationPage = ({ currentUser, onFormSubmit }) => {
             name="name"
             value={newDestination.name}
             onChange={handleChange}
+            required
           />
         </div>
         <div>
@@ -138,6 +128,7 @@ export const AddDestinationPage = ({ currentUser, onFormSubmit }) => {
             name="country"
             value={newDestination.country}
             onChange={handleChange}
+            required
           />
         </div>
         <div>
@@ -157,6 +148,7 @@ export const AddDestinationPage = ({ currentUser, onFormSubmit }) => {
             name="continent"
             value={newDestination.continent}
             onChange={handleChange}
+            required
           >
             <option value="">Select Continent</option>
             {continents.map((continent) => (
@@ -173,6 +165,7 @@ export const AddDestinationPage = ({ currentUser, onFormSubmit }) => {
             name="details"
             value={newDestination.details}
             onChange={handleChange}
+            required
           />
         </div>
         <div>
@@ -182,12 +175,7 @@ export const AddDestinationPage = ({ currentUser, onFormSubmit }) => {
             id="isLiked"
             name="isLiked"
             checked={newDestination.isLiked}
-            onChange={() =>
-              setNewDestination({
-                ...newDestination,
-                isLiked: !newDestination.isLiked,
-              })
-            }
+            onChange={handleCheckboxChange}
           />
         </div>
         <div>
@@ -196,7 +184,7 @@ export const AddDestinationPage = ({ currentUser, onFormSubmit }) => {
             type="date"
             id="visitedDate"
             name="visitedDate"
-            value={newDestination.visitedDate}
+            value={newDestination.visitedDate || ""}
             onChange={handleChange}
             required
           />

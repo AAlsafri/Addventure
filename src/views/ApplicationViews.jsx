@@ -1,23 +1,20 @@
 import { useEffect, useState } from "react";
 import { UserViews } from "./UserViews";
-import {
-  getAllDestinations,
-  getDestinationsByUserId,
-} from "../services/destinationService";
+import { getDestinationsByUserId } from "../services/destinationService";
 
 export const ApplicationViews = () => {
   const [currentUser, setCurrentUser] = useState({});
   const [userDestinations, setUserDestinations] = useState([]);
 
   useEffect(() => {
-    const localTripifyUser = localStorage.getItem("trip-ify_user");
-    const tripifyUserObject = JSON.parse(localTripifyUser);
+    const localToken = localStorage.getItem("token");
 
-    if (tripifyUserObject) {
-      setCurrentUser(tripifyUserObject);
+    if (localToken) {
+      // Simulate fetching user data
+      const user = { id: 1, username: "current_user" }; // Replace with real API call if needed
+      setCurrentUser(user);
 
-      // Fetch destinations by user ID
-      getDestinationsByUserId(tripifyUserObject.id).then((destinations) => {
+      getDestinationsByUserId(user.id).then((destinations) => {
         setUserDestinations(destinations);
       });
     }

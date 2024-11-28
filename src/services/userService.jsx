@@ -1,53 +1,98 @@
-// userService.jsx
-export const getUsers = () => {
-  return fetch("http://localhost:8088/users").then((res) => res.json());
+import axios from "axios";
+
+const apiUrl = "http://127.0.0.1:8000/";
+
+// Register a new user
+export const register = async (username, password) => {
+  const response = await axios.post(`${apiUrl}register/`, {
+    username,
+    password,
+  });
+  return response.data;
 };
+
+// Login user
+export const login = async (username, password) => {
+  const response = await axios.post(`${apiUrl}login/`, {
+    username,
+    password,
+  });
+  return response.data;
+};
+
+// Fetch the user profile
+export const getUserProfile = async () => {
+  const token = localStorage.getItem("token");
+  const response = await axios.get(`${apiUrl}me/`, {
+    headers: {
+      Authorization: `Token ${token}`,
+    },
+  });
+  return response.data;
+};
+
+// Fetch all users
+export const getAllUsers = async () => {
+  const token = localStorage.getItem("token");
+  const response = await axios.get(`${apiUrl}users/`, {
+    headers: {
+      Authorization: `Token ${token}`,
+    },
+  });
+  return response.data;
+};
+
+// Fetch users (alias for getAllUsers for clarity)
+export const getUsers = getAllUsers;
 
 // Fetch a user by ID
-export const getUserById = (userId) => {
-  return fetch(`http://localhost:8088/users/${userId}`).then((res) =>
-    res.json()
-  );
-};
-
-// Fetch a user by email
-export const getUserByEmail = (email) => {
-  return fetch(`http://localhost:8088/users?email=${email}`).then((res) =>
-    res.json()
-  );
-};
-
-// Create a new user
-export const addUser = async (user) => {
-  const response = await fetch("http://localhost:8088/users", {
-    method: "POST",
+export const getUserById = async (id) => {
+  const token = localStorage.getItem("token");
+  const response = await axios.get(`${apiUrl}users/${id}/`, {
     headers: {
-      "Content-Type": "application/json",
+      Authorization: `Token ${token}`,
     },
-    body: JSON.stringify(user),
   });
-  return response.json();
-};
-
-// Update an existing user
-export const updateUser = (userId, updatedUser) => {
-  return fetch(`http://localhost:8088/users/${userId}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(updatedUser),
-  }).then((res) => res.json());
+  return response.data;
 };
 
 // Delete a user
 export const deleteUser = async (id) => {
-  await fetch(`http://localhost:8088/users/${id}`, {
-    method: "DELETE",
+  const token = localStorage.getItem("token");
+  await axios.delete(`${apiUrl}users/${id}/`, {
+    headers: {
+      Authorization: `Token ${token}`,
+    },
   });
 };
 
-// NEW: Fetch all users
-export const getAllUsers = () => {
-  return fetch("http://localhost:8088/users").then((res) => res.json());
+// Add a new user
+export const addUser = async (userData) => {
+  const token = localStorage.getItem("token");
+  const response = await axios.post(`${apiUrl}users/`, userData, {
+    headers: {
+      Authorization: `Token ${token}`,
+    },
+  });
+  return response.data;
+};
+
+// Update a user
+export const updateUser = async (id, updatedData) => {
+  const token = localStorage.getItem("token");
+  const response = await axios.put(`${apiUrl}users/${id}/`, updatedData, {
+    headers: {
+      Authorization: `Token ${token}`,
+    },
+  });
+  return response.data;
+};
+export const getUserByEmail = async (email) => {
+  const token = localStorage.getItem("token");
+  const response = await axios.get(`${apiUrl}users?email=${email}`, {
+    headers: {
+      Authorization: `Token ${token}`,
+    },
+  });
+  return response.data;
 };

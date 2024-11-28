@@ -8,9 +8,6 @@ import { UserList } from "../components/users/UserList";
 import { AddUserForm } from "../components/users/AddUserForm";
 import { EditUserForm } from "../components/users/EditUserForm";
 import { UserDetails } from "../components/users/UserDetails";
-import UserExplorations from "../components/users/UserExplorations";
-import { UserJourney } from "../Journey/UserJourney";
-import UserProfile from "../components/users/UserProfile";
 
 export const UserViews = ({ currentUser }) => {
   return (
@@ -25,15 +22,6 @@ export const UserViews = ({ currentUser }) => {
         }
       >
         <Route index element={<Welcome />} />
-        {/* <Route path="explorations" element={<UserExplorations />} />
-        <Route
-          path="journey"
-          element={<UserJourney currentUser={currentUser} />}
-        />
-        <Route
-          path="profile"
-          element={<UserProfile currentUser={currentUser} />}
-        /> */}
         <Route path="destinations">
           <Route
             index

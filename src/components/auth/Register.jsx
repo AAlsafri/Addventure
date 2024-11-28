@@ -1,116 +1,126 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { register } from "../../services/userService";
 import "./Login.css";
-import { addUser, getUserByEmail } from "../../services/userService";
 
 export const Register = () => {
-  const [customer, setCustomer] = useState({
+  const [user, setUser] = useState({
+    username: "",
     email: "",
-    fullName: "",
-    password: "", // New field for password
-    isStaff: false,
+    password: "",
+    confirmPassword: "",
   });
+  const [error, setError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
   const navigate = useNavigate();
 
-  const registerNewUser = () => {
-    addUser(customer).then((createdUser) => {
-      if (createdUser.hasOwnProperty("id")) {
-        localStorage.setItem(
-          "trip-ify_user",
-          JSON.stringify({
-            id: createdUser.id,
-            isStaff: createdUser.isStaff,
-          })
-        );
-
-        navigate("/");
-      }
-    });
-  };
-
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
-    getUserByEmail(customer.email).then((response) => {
-      if (response.length > 0) {
-        window.alert("Account with that email address already exists");
+
+    if (user.password !== user.confirmPassword) {
+      setPasswordError("Passwords do not match.");
+      return;
+    }
+
+    try {
+      const response = await register(user.username, user.password, user.email);
+      if (response.token) {
+        localStorage.setItem("token", response.token);
+        navigate("/destinations");
       } else {
-        registerNewUser();
+        setError("Registration failed. Please try again.");
       }
-    });
+    } catch (err) {
+      console.error("Registration error:", err.response?.data || err.message);
+      setError("Registration failed. Please check your inputs.");
+    }
   };
 
-  const updateCustomer = (evt) => {
-    const copy = { ...customer };
-    copy[evt.target.id] = evt.target.value;
-    setCustomer(copy);
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setUser((prevUser) => ({ ...prevUser, [name]: value }));
+    if (name === "password" || name === "confirmPassword") {
+      setPasswordError(""); // Clear password error on input change
+    }
   };
 
   return (
-    <main style={{ textAlign: "center" }}>
-      <form className="add-destination-form" onSubmit={handleRegister}>
-        <h1>Add·venturer</h1>
-        <h2>Please Register</h2>
-        <fieldset>
-          <div className="form-group">
-            <input
-              onChange={updateCustomer}
-              type="text"
-              id="fullName"
-              className="form-control"
-              placeholder="Enter your name"
-              required
-              autoFocus
-            />
-          </div>
-        </fieldset>
-        <fieldset>
-          <div className="form-group">
-            <input
-              onChange={updateCustomer}
-              type="email"
-              id="email"
-              className="form-control"
-              placeholder="Email address"
-              required
-            />
-          </div>
-        </fieldset>
-        <fieldset>
-          <div className="form-group">
-            <input
-              onChange={updateCustomer}
-              type="password"
-              id="password"
-              className="form-control"
-              placeholder="Password"
-              required
-            />
-          </div>
-        </fieldset>
-        <fieldset>
-          <div className="form-group">
-            <label>
+    <main className="page-wrapper">
+      <div className="container-login">
+        <form onSubmit={handleRegister} className="form-login">
+          {/* <h1>Add·venturer</h1> */}
+          <h2>Please Register</h2>
+          {error && <p className="error-message">{error}</p>}
+          {passwordError && <p className="error-message">{passwordError}</p>}
+          <fieldset>
+            <div className="form-group">
               <input
-                onChange={(evt) => {
-                  const copy = { ...customer };
-                  copy.isStaff = evt.target.checked;
-                  setCustomer(copy);
-                }}
-                type="checkbox"
-                id="isStaff"
+                type="text"
+                name="username"
+                value={user.username}
+                onChange={handleChange}
+                className="form-control"
+                placeholder="Enter your username"
+                required
               />
-              I am an employee{" "}
-            </label>
-          </div>
-        </fieldset>
-        <fieldset>
-          <div className="form-group">
-            <button className="login-btn btn-info" type="submit">
-              Register
-            </button>
-          </div>
-        </fieldset>
-      </form>
+            </div>
+          </fieldset>
+          <fieldset>
+            <div className="form-group">
+              <input
+                type="email"
+                name="email"
+                value={user.email}
+                onChange={handleChange}
+                className="form-control"
+                placeholder="Enter your email"
+                required
+              />
+            </div>
+          </fieldset>
+          <fieldset>
+            <div className="form-group">
+              <input
+                type="password"
+                name="password"
+                value={user.password}
+                onChange={handleChange}
+                className="form-control"
+                placeholder="Password"
+                required
+              />
+            </div>
+          </fieldset>
+          <fieldset>
+            <div className="form-group">
+              <input
+                type="password"
+                name="confirmPassword"
+                value={user.confirmPassword}
+                onChange={handleChange}
+                className="form-control"
+                placeholder="Re-enter Password"
+                required
+              />
+            </div>
+          </fieldset>
+          <fieldset>
+            <div className="form-group">
+              <button className="login-btn" type="submit">
+                Register
+              </button>
+            </div>
+          </fieldset>
+        </form>
+        <p>
+          Already a registered member?{" "}
+          <Link to="/login" className="form-link">
+            Login here!
+          </Link>
+        </p>
+      </div>
     </main>
   );
 };
+
+export default Register;
