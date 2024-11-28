@@ -11,8 +11,12 @@ export const EditDestinationForm = ({ destination, onFormSubmit }) => {
 
   useEffect(() => {
     const fetchContinents = async () => {
-      const conts = await getAllContinents();
-      setContinents(conts);
+      try {
+        const conts = await getAllContinents();
+        setContinents(conts);
+      } catch (error) {
+        console.error("Failed to fetch continents:", error);
+      }
     };
 
     fetchContinents();
@@ -29,8 +33,8 @@ export const EditDestinationForm = ({ destination, onFormSubmit }) => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      await updateDestination(editedDestination);
-      onFormSubmit(); // Close the form and refresh the list
+      await updateDestination(editedDestination.id, editedDestination); // Pass ID and data
+      onFormSubmit(); // Notify parent to refresh the list
       navigate("/destinations");
     } catch (error) {
       console.error("Failed to update destination:", error);
@@ -83,16 +87,16 @@ export const EditDestinationForm = ({ destination, onFormSubmit }) => {
           />
         </div>
         <div>
-          <label htmlFor="continent_id">Continent:</label>
+          <label htmlFor="continent">Continent:</label>
           <select
-            id="continent_id"
-            name="continent_id"
-            value={editedDestination.continent_id}
+            id="continent"
+            name="continent"
+            value={editedDestination.continent}
             onChange={handleChange}
           >
             <option value="">Select Continent</option>
             {continents.map((continent) => (
-              <option key={continent.id} value={continent.id}>
+              <option key={continent.id} value={continent.name}>
                 {continent.name}
               </option>
             ))}
@@ -117,6 +121,16 @@ export const EditDestinationForm = ({ destination, onFormSubmit }) => {
             onChange={handleChange}
           />
         </div>
+        <div>
+          <label htmlFor="visitedDate">Visited Date:</label>
+          <input
+            type="date"
+            id="visitedDate"
+            name="visitedDate"
+            value={editedDestination.visitedDate || ""}
+            onChange={handleChange}
+          />
+        </div>
         <button type="submit" className="add-form-button">
           Update Destination
         </button>
@@ -124,4 +138,3 @@ export const EditDestinationForm = ({ destination, onFormSubmit }) => {
     </div>
   );
 };
-// Auto Nav to /destination right as you click btn for submit

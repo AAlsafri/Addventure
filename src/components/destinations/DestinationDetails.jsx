@@ -8,27 +8,29 @@ import "./Destinations.css";
 
 export const DestinationDetails = () => {
   const { destinationId } = useParams();
+  console.log("Destination ID from URL:", destinationId);
   const navigate = useNavigate();
   const [destination, setDestination] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editedDestination, setEditedDestination] = useState({
     name: "",
     country: "",
-    state: "N/A", // Default to N/A
-    continent_id: "N/A", // Default to N/A
+    state: "",
+    continent: "",
     details: "",
     isLiked: false,
+    visitedDate: "",
   });
 
   useEffect(() => {
     getDestinationById(destinationId)
       .then((data) => {
         setDestination(data);
-        // Set default values for missing fields
         setEditedDestination({
           ...data,
-          state: data.state || "N/A",
-          continent_id: data.continent_id || "N/A",
+          state: data.state || "",
+          continent: data.continent || "",
+          visitedDate: data.visitedDate || "",
         });
       })
       .catch((error) => console.error("Failed to fetch destination:", error));
@@ -45,6 +47,9 @@ export const DestinationDetails = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
+
+    console.log("Updating destination with ID:", destinationId); // Debugging line
+
     updateDestination(destinationId, editedDestination)
       .then(() => {
         setDestination(editedDestination);
@@ -56,22 +61,6 @@ export const DestinationDetails = () => {
   if (!destination) {
     return <p>Loading...</p>;
   }
-
-  const continents = [
-    { id: "1", name: "North America" },
-    { id: "2", name: "Europe" },
-    { id: "3", name: "Asia" },
-    { id: "4", name: "Africa" },
-    { id: "5", name: "Australia" },
-    { id: "6", name: "South America" },
-    { id: "7", name: "Antarctica" },
-  ];
-
-  const continentOptions = continents.map((continent) => (
-    <option key={continent.id} value={continent.id}>
-      {continent.name}
-    </option>
-  ));
 
   return (
     <div className="destination-form">
@@ -111,15 +100,13 @@ export const DestinationDetails = () => {
             </div>
             <div>
               <label htmlFor="continent">Continent:</label>
-              <select
+              <input
+                type="text"
                 id="continent"
-                name="continent_id"
-                value={editedDestination.continent_id}
+                name="continent"
+                value={editedDestination.continent}
                 onChange={handleChange}
-              >
-                <option value="N/A">N/A</option>
-                {continentOptions}
-              </select>
+              />
             </div>
             <div>
               <label htmlFor="details">Details:</label>
@@ -145,6 +132,16 @@ export const DestinationDetails = () => {
                 }
               />
             </div>
+            <div>
+              <label htmlFor="visitedDate">Visited Date:</label>
+              <input
+                type="date"
+                id="visitedDate"
+                name="visitedDate"
+                value={editedDestination.visitedDate}
+                onChange={handleChange}
+              />
+            </div>
             <button type="submit" className="submit-button">
               Save
             </button>
@@ -160,15 +157,16 @@ export const DestinationDetails = () => {
             <strong>State:</strong> {destination.state || "N/A"}
           </p>
           <p>
-            <strong>Continent:</strong>{" "}
-            {continents.find((c) => c.id === destination.continent_id)?.name ||
-              "N/A"}
+            <strong>Continent:</strong> {destination.continent || "N/A"}
           </p>
           <p>
             <strong>Details:</strong> {destination.details}
           </p>
           <p>
             <strong>Liked:</strong> {destination.isLiked ? "Yes" : "No"}
+          </p>
+          <p>
+            <strong>Visited On:</strong> {destination.visitedDate || "N/A"}
           </p>
           <button onClick={handleEditToggle}>Edit</button>
         </div>

@@ -1,9 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   getAllDestinations,
   deleteDestination,
   getDestinationById,
-  updateDestination,
 } from "../../services/destinationService";
 import { Destination } from "./Destination";
 import { DestinationFilterBar } from "./DestinationFilterBar";
@@ -16,11 +15,8 @@ export const DestinationList = ({ currentUser }) => {
   const [showLiked, setShowLiked] = useState(false);
   const [filteredDestinations, setFilteredDestinations] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [showForm, setShowForm] = useState(false); // State for add form visibility
-  const [editDestination, setEditDestination] = useState(null); // State for edit form
-
-  const headerRef = useRef(null); // Reference to the header
-  const containerRef = useRef(null); // Reference to the container
+  const [showForm, setShowForm] = useState(false);
+  const [editDestination, setEditDestination] = useState(null);
 
   const fetchDestinations = () => {
     getAllDestinations()
@@ -69,14 +65,25 @@ export const DestinationList = ({ currentUser }) => {
     const bottomRightBorders = document.querySelector(".bottom-right-borders");
     const destinations = document.querySelector(".destinations");
 
-    setTimeout(() => {
+    if (header) {
       header.style.animation = "splitBorders 1s forwards";
-      bottomRightBorders.style.animation = "moveBottomRight 1s forwards";
+    } else {
+      console.warn(".destinations-header not found in the DOM.");
+    }
 
+    if (bottomRightBorders) {
+      bottomRightBorders.style.animation = "moveBottomRight 1s forwards";
+    } else {
+      console.warn(".bottom-right-borders not found in the DOM.");
+    }
+
+    if (destinations) {
       setTimeout(() => {
         destinations.style.opacity = 1;
-      }, 1000); // Delay to match the animation duration
-    }, 500); // Delay before starting the animation
+      }, 1000);
+    } else {
+      console.warn(".destinations not found in the DOM.");
+    }
   }, []);
 
   const handleDelete = (id) => {
@@ -93,25 +100,25 @@ export const DestinationList = ({ currentUser }) => {
 
   const handleAddClick = () => {
     setShowForm(true);
-    setEditDestination(null); // Hide the edit form if it's showing
+    setEditDestination(null);
   };
 
   const handleFormSubmit = () => {
     setShowForm(false);
-    setEditDestination(null); // Hide the edit form
-    fetchDestinations(); // Refresh the list after adding/editing a destination
+    setEditDestination(null);
+    fetchDestinations();
   };
 
   const handleEditClick = async (id) => {
     const destinationToEdit = await getDestinationById(id);
-    setEditDestination(destinationToEdit); // Set the destination to edit
-    setShowForm(false); // Hide the add form if it's showing
+    setEditDestination(destinationToEdit);
+    setShowForm(false);
   };
 
   return (
     <div className="destinations-page">
       <div className="bottom-right-borders">
-        <div ref={headerRef} className="destinations-header">
+        <div className="destinations-header">
           <h2>Destinations</h2>
           <DestinationFilterBar
             setShowLiked={setShowLiked}
@@ -123,8 +130,18 @@ export const DestinationList = ({ currentUser }) => {
             </button>
           )}
         </div>
+        <div className="hint-section">
+          <h3>💡Tips</h3>
+          <ul>
+            <li>
+              Click on the "Add Destination" button to add a few destinations
+              and watch the cards appear.
+            </li>
+            <li>Click on the destination's name to edit its fields or info.</li>
+          </ul>
+        </div>
       </div>
-      <div ref={containerRef} className="destinations-container">
+      <div className="destinations-container">
         {showForm ? (
           <AddDestinationPage
             currentUser={currentUser}

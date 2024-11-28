@@ -1,5 +1,8 @@
 export const getAllContinents = async () => {
-  const response = await fetch("http://localhost:8088/continents");
+  const token = localStorage.getItem("token"); // Authentication token
+  const response = await fetch("http://127.0.0.1:8000/continents", {
+    headers: { Authorization: `Token ${token}` }, // Ensure token is included
+  });
   if (!response.ok) {
     throw new Error("Failed to fetch continents");
   }
