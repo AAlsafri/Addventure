@@ -46,6 +46,9 @@ export const AddDestinationPage = ({ currentUser, onFormSubmit }) => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
+    const userId = localStorage.getItem("userId");
+
     if (!currentUser) {
       setError("User not logged in");
       return;
@@ -57,6 +60,7 @@ export const AddDestinationPage = ({ currentUser, onFormSubmit }) => {
 
     const payload = {
       ...newDestination,
+      user_id: userId,
       continent: selectedContinent ? selectedContinent.id : null,
       location: `${newDestination.country}, ${newDestination.state}, ${newDestination.continent}`,
     };

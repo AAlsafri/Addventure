@@ -15,6 +15,7 @@ const Login = () => {
       const response = await login(username, password);
       if (response.token) {
         localStorage.setItem("token", response.token);
+        localStorage.setItem("userId", response.user_id);
         navigate("/destinations");
       } else {
         setError("Login failed. Please check your credentials.");

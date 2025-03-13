@@ -12,6 +12,9 @@ export const getAllDestinations = async () => {
 
 export const addNewDestination = async (destination) => {
   const token = localStorage.getItem("token");
+  console.log("Using token to create destination:", token);
+  console.log("Destination data being sent:", destination);
+
   const response = await axios.post(apiUrl, destination, {
     headers: {
       Authorization: `Token ${token}`,

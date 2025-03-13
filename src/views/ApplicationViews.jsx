@@ -7,11 +7,9 @@ export const ApplicationViews = () => {
   const [userDestinations, setUserDestinations] = useState([]);
 
   useEffect(() => {
-    const localToken = localStorage.getItem("token");
-
-    if (localToken) {
-      // Simulate fetching user data
-      const user = { id: 1, username: "current_user" }; // Replace with real API call if needed
+    const userId = localStorage.getItem("userId");
+    if (userId) {
+      const user = { id: parseInt(userId), username: "current_user" };
       setCurrentUser(user);
 
       getDestinationsByUserId(user.id).then((destinations) => {
@@ -21,7 +19,11 @@ export const ApplicationViews = () => {
   }, []);
 
   return currentUser.id ? (
-    <UserViews currentUser={currentUser} destinations={userDestinations} />
+    <UserViews
+      currentUser={currentUser}
+      destinations={userDestinations}
+      setCurrentUser={setCurrentUser}
+    />
   ) : (
     <div>Loading...</div>
   );

@@ -9,6 +9,7 @@ import { DestinationFilterBar } from "./DestinationFilterBar";
 import "./Destinations.css";
 import { AddDestinationPage } from "./AddDestinationForm";
 import { EditDestinationForm } from "./EditDestination";
+import { getUserById } from "../../services/userService";
 
 export const DestinationList = ({ currentUser }) => {
   const [allDestinations, setAllDestinations] = useState([]);
@@ -23,7 +24,7 @@ export const DestinationList = ({ currentUser }) => {
       .then((destinationsArray) => {
         if (Array.isArray(destinationsArray)) {
           const userDestinations = destinationsArray.filter(
-            (destination) => destination.user_id === currentUser.id
+            (destination) => destination.user_id === currentUser?.id
           );
           setAllDestinations(userDestinations);
         } else {
@@ -39,7 +40,10 @@ export const DestinationList = ({ currentUser }) => {
   };
 
   useEffect(() => {
-    fetchDestinations();
+    if (currentUser?.id) {
+      console.log("Fetching destinations for user:", currentUser);
+      fetchDestinations();
+    }
   }, [currentUser]);
 
   useEffect(() => {
@@ -65,32 +69,21 @@ export const DestinationList = ({ currentUser }) => {
     const bottomRightBorders = document.querySelector(".bottom-right-borders");
     const destinations = document.querySelector(".destinations");
 
-    if (header) {
-      header.style.animation = "splitBorders 1s forwards";
-    } else {
-      console.warn(".destinations-header not found in the DOM.");
-    }
-
-    if (bottomRightBorders) {
+    if (header) header.style.animation = "splitBorders 1s forwards";
+    if (bottomRightBorders)
       bottomRightBorders.style.animation = "moveBottomRight 1s forwards";
-    } else {
-      console.warn(".bottom-right-borders not found in the DOM.");
-    }
-
     if (destinations) {
       setTimeout(() => {
         destinations.style.opacity = 1;
       }, 1000);
-    } else {
-      console.warn(".destinations not found in the DOM.");
     }
   }, []);
 
   const handleDelete = (id) => {
     deleteDestination(id)
       .then(() => {
-        setAllDestinations((prevDestinations) =>
-          prevDestinations.filter((destination) => destination.id !== id)
+        setAllDestinations((prev) =>
+          prev.filter((destination) => destination.id !== id)
         );
       })
       .catch((error) => {

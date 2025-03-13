@@ -87,6 +87,8 @@ export const updateUser = async (id, updatedData) => {
   });
   return response.data;
 };
+
+// Fetch a user by email
 export const getUserByEmail = async (email) => {
   const token = localStorage.getItem("token");
   const response = await axios.get(`${apiUrl}users?email=${email}`, {
